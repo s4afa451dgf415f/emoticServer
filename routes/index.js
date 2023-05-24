@@ -6,7 +6,24 @@ var router = express.Router();
 const IndexModel = require('../models/IndexModel');
 const userModel = require('../models/userModel');
 const emoticModel = require('../models/emoticModel');
+const sharp = require('sharp');
 
+//图片压缩给后台审核
+
+
+function compress(base64Data) {
+    const buffer = Buffer.from(base64Data, 'base64');
+    console.log(buffer)
+    sharp(buffer)
+        .resize(800, 600)
+        .jpeg({quality: 50})
+        .toFile('output.jpg', (err, info) => {
+            if (err) {
+                console.error(err);
+            }
+            console.log(info);
+        });
+}
 
 //token判断中间件
 let validateToken=async (req,res,next)=> {
@@ -51,10 +68,8 @@ router.get('/read', (req, res) => {
         sort[sortname] = sortorder === 'desc' ? 1 : -1;
     }
     const sortObj = sortname ? { [sortname]: sort[sortname] } : { upTime: -1 };
-
     // 构造限制条件（即跳过前面几条数据）
     const skipNum = (page - 1) * limit;
-
     // 执行查询操作并响应结果
     // 使用Promise方式处理
     let tempCount=null
@@ -65,7 +80,13 @@ router.get('/read', (req, res) => {
         .skip(skipNum)
         .limit(parseInt(limit))})
             .then(data => {
+                data.forEach(e=>console.log(e.upTime))
             // 响应成功的提示
+            //     for(let i=0;i<data.length;i++){
+            //         for(let j=0;i<data[i].fileList.length;j++){
+            //             data[i].fileList[j]=compress(data[i].fileList[j])
+            //         }
+            //     }
             res.json({
                 data: {
                     code: 200,
@@ -82,7 +103,8 @@ router.get('/read', (req, res) => {
 //增加数据
 router.post('/creat', (req, res) => {
   const { tags, other, fileList } = req.body;
-  const upTime = new Date().toLocaleDateString();
+  const upTime = new Date().getTime();
+  console.log(upTime)
   const newItem={
     id: shortid.generate(),
     tags: tags,
