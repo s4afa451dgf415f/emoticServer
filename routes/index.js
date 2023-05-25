@@ -50,7 +50,7 @@ let validateToken=async (req,res,next)=> {
 
 /* GET home page. */
 router.get('/read', (req, res) => {
-    const { name, sortname, sortorder, page = 1, limit } = req.query;
+    const { name, sortname, sortorder, page = 1, limit=2 } = req.query;
 
     // 构造查询条件
     const condition = {};
