@@ -20,6 +20,11 @@ let validateToken=async (req,res,next)=> {
         });
     }
 }
+
+let randomTag=function(data){
+    let tempRow = data[parseInt(Math.random() * (data.length))]
+    return tempRow.fileList[parseInt(Math.random() * (tempRow.fileList.length))]
+}
 router.get('/readEmotic', (req, res) => {
     const { name, sortname, sortorder, page = 1, limit=2 } = req.query;
 
@@ -70,6 +75,7 @@ router.get('/readEmotic', (req, res) => {
 
 router.get('/getOneEmo', (req, res) => {
     const { name } = req.query;
+    console.log(name)
     // 构造查询条件
     const condition = {};
     if (name) {
@@ -90,9 +96,10 @@ router.get('/getOneEmo', (req, res) => {
                 let tagStr = tagArr.toString()
                 let openai = "";
                 let chatContent = `我需要你完成词义相似度功能，请从[${tagStr}]这个数组中选择与${name}关联性或词义最相近的一个标签，请你直接输出答案不要加任何标点符号`
+                console.log(chatContent)
                 const connectOpenAI = async () => {
                     const configuration = new Configuration({
-                        apiKey: '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',
+                        apiKey: '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',
                         proxy: {
                             host: 'localhost',
                             port: 7980,
@@ -112,24 +119,27 @@ router.get('/getOneEmo', (req, res) => {
                     console.log("result", completion.data.choices[0].message);
                     let relativeTag = completion.data.choices[0].message.content
                     data=await emoticModel.find({tag:relativeTag})
-                    let tempRow = data[parseInt(Math.random() * (data.length))]
-                    emo = tempRow.fileList[parseInt(Math.random() * (tempRow.fileList.length))]
+                    emo = randomTag(data)
                     res.send(
                         emo
                     );
-                });
+                })
+            .catch(async err => {
+                console.log('gpt调用失败~~~，将使用"万能表情"')
+                data = await emoticModel.find({tag: '万能表情'})
+                emo = randomTag(data)
+                res.send(emo);
+            });
             } else {
-                let tempRow = data[parseInt(Math.random() * (data.length))]
-                emo = tempRow.fileList[parseInt(Math.random() * (tempRow.fileList.length))]
+                emo = randomTag(data)
                 res.send(
                     emo
                 );
             }
             // 响应成功的提示
-
         })
         .catch(err => {
-            res.status(500).send('读取失败~~~');
+            res.status(500).send('读取表情失败~~~');
         });
 });
 

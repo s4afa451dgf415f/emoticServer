@@ -6,24 +6,6 @@ var router = express.Router();
 const IndexModel = require('../models/IndexModel');
 const userModel = require('../models/userModel');
 const emoticModel = require('../models/emoticModel');
-const sharp = require('sharp');
-
-//图片压缩给后台审核
-
-
-function compress(base64Data) {
-    const buffer = Buffer.from(base64Data, 'base64');
-    console.log(buffer)
-    sharp(buffer)
-        .resize(800, 600)
-        .jpeg({quality: 50})
-        .toFile('output.jpg', (err, info) => {
-            if (err) {
-                console.error(err);
-            }
-            console.log(info);
-        });
-}
 
 //token判断中间件
 let validateToken=async (req,res,next)=> {
