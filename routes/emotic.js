@@ -70,7 +70,6 @@ router.get('/readEmotic', (req, res) => {
 
 router.get('/getOneEmo', (req, res) => {
     const { name } = req.query;
-    console.log(name)
     // 构造查询条件
     const condition = {};
     if (name) {
@@ -91,7 +90,6 @@ router.get('/getOneEmo', (req, res) => {
                 let tagStr = tagArr.toString()
                 let openai = "";
                 let chatContent = `我需要你完成词义相似度功能，请从[${tagStr}]这个数组中选择与${name}关联性或词义最相近的一个标签，请你直接输出答案不要加任何标点符号`
-                console.log(chatContent)
                 const connectOpenAI = async () => {
                     const configuration = new Configuration({
                         apiKey: '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',
@@ -137,11 +135,9 @@ router.get('/getOneEmo', (req, res) => {
 
 router.post('/editEmotic', validateToken, (req, res) => {
     const { id, tags, other, upTime, audit, fileList } = req.body;
-    // emoticModel.find().then(e=>console.log(e)).catch(err=>console.log(err))
     const audit_num = parseInt(audit);
     Promise.resolve({then:resolve=>{if(audit_num){resolve(1)}resolve(0)}})
         .then(type=> {
-                console.log('emoticModel将执行修改')
                 return emoticModel.findOneAndUpdate({id:id},{
                     tags:tags,
                     other:other,
