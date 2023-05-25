@@ -84,7 +84,6 @@ router.get('/getOneEmo', (req, res) => {
     let emo=''
         emoticModel.find(condition)
         .then(async data => {
-            console.log(data)
             if (data.length === 0) {
 
                 data = await emoticModel.find();
@@ -95,7 +94,11 @@ router.get('/getOneEmo', (req, res) => {
                 console.log(chatContent)
                 const connectOpenAI = async () => {
                     const configuration = new Configuration({
-                        apiKey: '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'
+                        apiKey: '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',
+                        proxy: {
+                            host: 'localhost',
+                            port: 7980,
+                        },
                     });
                     openai = new OpenAIApi(configuration);
                     return {openai};
@@ -109,20 +112,23 @@ router.get('/getOneEmo', (req, res) => {
                         stream: false, // 是否是数据流，默认为 false
                     });
                     console.log("result", completion.data.choices[0].message);
-                    // console.log("result", completion.data.choices[0].message.content);
-                    emo = completion.data.choices[0].message.content
-                    // console.log("result", completion.data.choices[0].message);
+                    let relativeTag = completion.data.choices[0].message.content
+                    data=await emoticModel.find({tag:relativeTag})
+                    let tempRow = data[parseInt(Math.random() * (data.length))]
+                    emo = tempRow.fileList[parseInt(Math.random() * (tempRow.fileList.length))]
+                    res.send(
+                        emo
+                    );
                 });
             } else {
                 let tempRow = data[parseInt(Math.random() * (data.length))]
-                console.log(tempRow)
                 emo = tempRow.fileList[parseInt(Math.random() * (tempRow.fileList.length))]
-                console.log(emo)
+                res.send(
+                    emo
+                );
             }
             // 响应成功的提示
-            res.send(
-                emo
-            );
+
         })
         .catch(err => {
             res.status(500).send('读取失败~~~');
