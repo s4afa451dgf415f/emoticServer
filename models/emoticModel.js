@@ -34,7 +34,7 @@ let emoticSchema = new mongoose.Schema({
 });
 
 //创建模型对象  对文档操作的封装对象
-let IndexModel = mongoose.model('emotic', emoticSchema);
+let emoticModel = mongoose.model('emotic', emoticSchema);
 
 //暴露模型对象
-module.exports = IndexModel;
+module.exports = emoticModel;

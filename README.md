@@ -27,6 +27,7 @@ npm start
 |[/index/create](#create) | 上传表情包接口|
 |[/index/edit](#login) | 审核或者编辑未审核表情包接口|
 |[/index/del](#del) | 删除未审核表情包接口|
+|[/index/getUndefinedTags](#getUndefinedTags) | 获得用户所查tag列表接口|
 
 ### 过审表情包接口
 |  接口  | 说明 |
@@ -58,14 +59,14 @@ npm start
   * 请求参数说明：
 
     | 名称 | 类型 | 必填 |说明|
-              |----- |------| ---- |----|
+    |----- |------| ---- |----|
     |password | string |true|用户名|
     |username | string |true|用户密码|
 
   * 返回参数说明：
 
     | 名称 | 类型 |说明|
-              |----- |------|----|
+    |----- |------|----|
     |data | object|菜单|
     |token | string|token|
 
@@ -82,18 +83,18 @@ npm start
   * 接口备注：获得列表和查询
   * 请求参数说明：
 
-  | 名称 | 类型 | 必填 |说明|
-      |----- |------| ---- |----|
-  |name | string |false|词条|
-  |sortname | string |false|排序名|
-  |sortorder | string |false|升降序|
-  |page | string |false|第几页|
-  |limit | string |true|每页最大行数|
+   | 名称 | 类型 | 必填 |说明|
+   |----- |------| ---- |----|
+   |name | string |false|词条|
+   |sortname | string |false|排序名|
+   |sortorder | string |false|升降序|
+   |page | string |false|第几页|
+   |limit | string |true|每页最大行数|
 
   * 返回参数说明：
 
     | 名称 | 类型 |说明|
-              |----- |------|----|
+    |----- |------|----|
     |count | string|未审核总行数|
     |list | object|这一页查询到的表|
 
@@ -108,16 +109,16 @@ npm start
   * 接口备注：用户上传表情包
   * 请求参数说明：
 
-  | 名称 | 类型 | 必填 |说明|
+    | 名称 | 类型 | 必填 |说明|
     |----- |------| ---- |----|
-  |fileList | array |true|图链|
-  |other | string |false|上传者|
-  |tags | array |true|词条|
+    |fileList | array |true|图链|
+    |other | string |false|上传者|
+    |tags | array |true|词条|
 
   * 返回参数说明：
 
     | 名称 | 类型 |说明|
-              |----- |------|----|
+    |----- |------|----|
     |code | Int|状态码|
 
   * JSON返回示例： {"code":200,"data":{"message":"添加成功"}}
@@ -131,18 +132,18 @@ npm start
   * 接口备注：管理人员对未审核表情包进行审核或者编辑
   * 请求参数说明：
 
-  | 名称 | 类型 | 必填 |说明|
-      |----- |------| ---- |----|
-  |audit | string |true|是否审核|
-  |fileList | array |true|图链|
-  |id | string |true|编号id|
-  |other | string |false|上传者|
-  |tags | array |true|词条|
+    | 名称 | 类型 | 必填 |说明|
+    |----- |------| ---- |----|
+    |audit | string |true|是否审核|
+    |fileList | array |true|图链|
+    |id | string |true|编号id|
+    |other | string |false|上传者|
+    |tags | array |true|词条|
 
   * 返回参数说明：
 
     | 名称 | 类型 |说明|
-              |----- |------|----|
+    |----- |------|----|
     |code | Int|状态码|
 
   * JSON返回示例： {"code":200,"data":{"message":"修改成功"}}
@@ -156,17 +157,36 @@ npm start
   * 接口备注：管理人员对未审核表情包进行删除
   * 请求参数说明：
 
-  | 名称 | 类型 | 必填 |说明|
-       |----- |------| ---- |----|
-  |id | string |true|编号id|
+    | 名称 | 类型 | 必填 |说明|
+    |----- |------| ---- |----|
+    |id | string |true|编号id|
 
   * 返回参数说明：
 
     | 名称 | 类型 |说明|
-              |----- |------|----|
+    |----- |------|----|
     |code | Int|状态码|
 
   * JSON返回示例： {"code":200,"message":"删除成功"}
+
+* <span id = "getUndefinedTags">获得用户所查tag列表接口</span>
+  * 接口地址：/index/getUndefinedTags
+  * 返回格式：Json
+  * 请求方式：Get
+  * 请求示例：http://www.baidu.com/index/getUndefinedTags
+  * 接口备注：获得列表和查询
+  * 请求参数说明：
+
+    | 名称 | 类型 | 必填 |说明|
+    |----- |------| ---- |----|
+
+  * 返回参数说明：
+
+    | 名称 | 类型 |说明|
+    |----- |------|----|
+    |list | Array|用户所查tag列表|
+
+  * JSON返回示例： 
 ***
 * <span id="readEmotic"><font color='red'>查询过审表情包</font></span>
   * 接口地址：/emotic/readEmotic
@@ -176,18 +196,18 @@ npm start
   * 接口备注：已审查的表情包供emotic平台用户端调用或后台人员查看
   * 请求参数说明：
 
-  | 名称 | 类型 | 必填 |说明|
+    | 名称 | 类型 | 必填 |说明|
     |----- |------| ---- |----|
-  |name | array |false|词条|
-  |sortname | string |false|排序名|
-  |sortorder | string |false|升降序|
-  |page | string |false|第几页|
-  |limit | string |false|每页最大行数|
+    |name | array |false|词条|
+    |sortname | string |false|排序名|
+    |sortorder | string |false|升降序|
+    |page | string |false|第几页|
+    |limit | string |false|每页最大行数|
 
   * 返回参数说明：
 
     | 名称 | 类型 |说明|
-              |----- |------|----|
+    |----- |------|----|
     |count | string|已审核总行数|
     |list | object|这一页查询到的表|
 
@@ -202,18 +222,18 @@ npm start
   * 接口备注：管理人员对过审表情包进行编辑
   * 请求参数说明：
 
-  | 名称 | 类型 | 必填 |说明|
-       |----- |------| ---- |----|
-  |audit | string |true|是否审核|
-  |fileList | array |true|图链|
-  |id | string |true|编号id|
-  |other | string |false|上传者|
-  |tags | array |true|词条|
+    | 名称 | 类型 | 必填 |说明|
+    |----- |------| ---- |----|
+    |audit | string |true|是否审核|
+    |fileList | array |true|图链|
+    |id | string |true|编号id|
+    |other | string |false|上传者|
+    |tags | array |true|词条|
 
   * 返回参数说明：
 
     | 名称 | 类型 |说明|
-              |----- |------|----|
+    |----- |------|----|
     |code | Int|状态码|
 
   * JSON返回示例： {"code":200,"data":{"message":"修改成功"}}
@@ -227,19 +247,19 @@ npm start
   * 接口备注：管理人员对过审表情包进行删除
   * 请求参数说明：
 
-  | 名称 | 类型 | 必填 |说明|
-      |----- |------| ---- |----|
-  |id | string |true|编号id|
+    | 名称 | 类型 | 必填 |说明|
+    |----- |------| ---- |----|
+    |id | string |true|编号id|
 
   * 返回参数说明：
 
     | 名称 | 类型 |说明|
-              |----- |------|----|
+    |----- |------|----|
     |code | Int|状态码|
 
   * JSON返回示例： {"code":200,"message":"删除成功"}
 ***
-* <span id="readEmotic"><font color='red'>随机获得单个表情</font></span>
+* <span id="getOneEmo"><font color='red'>随机获得单个表情</font></span>
   * 接口地址：/emotic/getOneEmo
   * 返回格式：Json
   * 请求方式：Get
@@ -247,14 +267,14 @@ npm start
   * 接口备注：使用此接口将根据tag随机获取表情包里的一个表情，近似词gpt调用失败或者没找到就用“万能表情”
   * 请求参数说明：
 
-  | 名称 | 类型 | 必填 |说明|
-      |----- |------| ---- |----|
-  |name  | array |false|词条|
+    | 名称 | 类型 | 必填 |说明|
+    |----- |------| ---- |----|
+    |name  | array |false|词条|
 
   * 返回参数说明：
 
     | 名称 | 类型 |说明|
-              |----- |-------|----|
+    |----- |-------|----|
     |data  | string|base64图片|
 
   * JSON返回示例： 数据太大就不展示了，就是返回一张base64图片

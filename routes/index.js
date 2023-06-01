@@ -6,6 +6,7 @@ var router = express.Router();
 const IndexModel = require('../models/IndexModel');
 const userModel = require('../models/userModel');
 const emoticModel = require('../models/emoticModel');
+const undefinedTagModel = require("../models/undefinedTagModel");
 
 //token判断中间件
 let validateToken=async (req,res,next)=> {
@@ -171,4 +172,21 @@ router.post('/del', validateToken,(req, res) => {
   }
 });
 
+//查看需要填充的关键词
+router.get('/getUndefinedTags', (req, res) => {
+    undefinedTagModel.find().sort({count:-1}).limit(10).then(data=>{
+        res.status(200).json({
+            code: 200,
+            data: {
+                message: '获取成功',
+                list:data
+            },
+        })
+    }).catch(err=>{
+        res.status(500).json({
+            code:500,
+            message:"获取失败",
+        })
+    })
+});
 module.exports = router;

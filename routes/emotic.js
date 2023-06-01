@@ -1,8 +1,11 @@
 const emoticModel = require('../models/emoticModel');
 const userModel = require('../models/userModel');
+const undefinedTagModel = require('../models/undefinedTagModel');
 var express = require('express');
 var router = express.Router();
-const { Configuration, OpenAIApi } = require("openai");
+var fs = require('fs');
+var path = require('path');
+// const { Configuration, OpenAIApi } = require("openai");
 
 
 let validateToken=async (req,res,next)=> {
@@ -29,13 +32,14 @@ router.get('/readEmotic', (req, res) => {
     const { name, sortname, sortorder, page = 1, limit=2 } = req.query;
 
     // 构造查询条件
-    const condition = {};
+    let condition = {};
     if (name) {
-        condition.$or = [
-            // {name: {$regex: new RegExp(name, 'i')}},
-            { tags: { $regex: new RegExp(name, 'i') } },
-            { other: { $regex: new RegExp(name, 'i') } }
-        ];
+        // condition.$or = [
+        //     // {name: {$regex: new RegExp(name, 'i')}},
+        //     { tags: { $regex: new RegExp(name, 'i') } },
+        //     { other: { $regex: new RegExp(name, 'i') } }
+        // ];
+        condition= { tags: { $regex: new RegExp(name, 'i') } }
     }
 
     // 构造排序条件
@@ -90,46 +94,57 @@ router.get('/getOneEmo', (req, res) => {
         emoticModel.find(condition)
         .then(async data => {
             if (data.length === 0) {
-
-                data = await emoticModel.find();
-                const tagArr = data.reduce((accumulator, currentValue) => accumulator.concat(currentValue.tags), []);
-                let tagStr = tagArr.toString()
-                let openai = "";
-                let chatContent = `我需要你完成词义相似度功能，请从[${tagStr}]这个数组中选择与${name}关联性或词义最相近的一个标签，请你直接输出答案不要加任何标点符号`
-                console.log(chatContent)
-                const connectOpenAI = async () => {
-                    const configuration = new Configuration({
-                        apiKey: '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',
-                        proxy: {
-                            host: 'localhost',
-                            port: 7980,
-                        },
-                    });
-                    openai = new OpenAIApi(configuration);
-                    return {openai};
-                };
-
-                connectOpenAI().then(async ({openai}) => {
-                    // 对话
-                    const completion = await openai.createChatCompletion({
-                        model: "gpt-3.5-turbo",
-                        messages: [{role: "user", content: chatContent}],
-                        stream: false, // 是否是数据流，默认为 false
-                    });
-                    console.log("result", completion.data.choices[0].message);
-                    let relativeTag = completion.data.choices[0].message.content
-                    data=await emoticModel.find({tag:relativeTag})
-                    emo = randomTag(data)
-                    res.send(
-                        emo
-                    );
-                })
-            .catch(async err => {
+                // data = await emoticModel.find();
+                // const tagArr = data.reduce((accumulator, currentValue) => accumulator.concat(currentValue.tags), []);
+                // let tagStr = tagArr.toString()
+                // let openai = "";
+                // let chatContent = `我需要你完成词义相似度功能，请从[${tagStr}]这个数组中选择与${name}关联性或词义最相近的一个标签，请你直接输出答案不要加任何标点符号`
+                // console.log(chatContent)
+                // const connectOpenAI = async () => {
+                //     const configuration = new Configuration({
+                //         apiKey: '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',
+                //         proxy: {
+                //             host: 'localhost',
+                //             port: 7980,
+                //         },
+                //     });
+                //     openai = new OpenAIApi(configuration);
+                //     return {openai};
+                // };
+                //
+                // connectOpenAI().then(async ({openai}) => {
+                //     // 对话
+                //     const completion = await openai.createChatCompletion({
+                //         model: "gpt-3.5-turbo",
+                //         messages: [{role: "user", content: chatContent}],
+                //         stream: false, // 是否是数据流，默认为 false
+                //     });
+                //     console.log("result", completion.data.choices[0].message);
+                //     let relativeTag = completion.data.choices[0].message.content
+                //     data=await emoticModel.find({tag:relativeTag})
+                //     emo = randomTag(data)
+                //     res.send(
+                //         emo
+                //     );
+                // })
+            // .catch(async err => {
                 console.log('gpt调用失败~~~，将使用"万能表情"')
+                //未定义的tag入库
+                if(name){
+                    let findData=await undefinedTagModel.find({name})
+                    console.log(findData)
+                    if(findData.length){
+                        await undefinedTagModel.findOneAndUpdate({name},{count:findData[0].count+1})
+                    }
+                    else{
+                        await undefinedTagModel.create({name,count:1})
+                            }
+                        //     fs.appendFileSync(path.resolve(__dirname, '../config/undefinedTag.json'),name+',')
+                        }
                 data = await emoticModel.find({tag: '万能表情'})
                 emo = randomTag(data)
                 res.send(emo);
-            });
+            // });
             } else {
                 emo = randomTag(data)
                 res.send(
@@ -139,9 +154,13 @@ router.get('/getOneEmo', (req, res) => {
             // 响应成功的提示
         })
         .catch(err => {
+            console.log(err)
             res.status(500).send('读取表情失败~~~');
         });
 });
+
+
+// 检测路径是否存在
 
 router.post('/editEmotic', validateToken, (req, res) => {
     const { id, tags, other, upTime, audit, fileList } = req.body;
@@ -165,6 +184,7 @@ router.post('/editEmotic', validateToken, (req, res) => {
         })})
         .catch(err=>res.status(500).send(`修改失败：${err}`))
 });
+
 router.post('/delEmotic', validateToken,(req, res) => {
     const { id } = req.body;
     if (!id) {
@@ -186,5 +206,6 @@ router.post('/delEmotic', validateToken,(req, res) => {
         })
     }
 });
+
 
 module.exports = router;
